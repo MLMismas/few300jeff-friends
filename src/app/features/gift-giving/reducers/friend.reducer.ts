@@ -7,17 +7,20 @@ export interface FriendEntity {
 }
 
 export interface FriendState extends EntityState<FriendEntity> {
-
+  selectedFriend: string;
 }
 
 export const adapter = createEntityAdapter<FriendEntity>();
 
-const initialState = adapter.getInitialState();
+const initialState = adapter.getInitialState(
+  { selectedFriend: null }
+);
 
 const reducerFunction = createReducer(
   initialState,
   on(actions.loadFriendsSucceeded, (state, action) => adapter.addAll(action.friends, state)),
-  on(actions.addFriend, (state, action) => adapter.addOne(action.entity, state))
+  on(actions.addFriend, (state, action) => adapter.addOne(action.entity, state)),
+  on(actions.selectSelectedFriend, (state, action) => ({ ...state, selectedFriend: action.id }))
 );
 
 export function reducer(state: FriendState = initialState, action: Action) {
@@ -25,4 +28,4 @@ export function reducer(state: FriendState = initialState, action: Action) {
 }
 
 
-export const { selectAll: selectFriendsArray } = adapter.getSelectors();
+export const { selectAll: selectFriendsArray, selectEntities: selectFriendEntities } = adapter.getSelectors();

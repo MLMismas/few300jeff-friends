@@ -1,0 +1,37 @@
+<header class="page-header">
+  <h5>Assign Holidays to Friends</h5>
+</header>
+<main>
+  <section>
+    <input type="hidden"
+           #friendId
+           value="{{(model$ | async)?.id}}">
+    <div class="alert alert-info">
+      <h6>Friend{{ (model$ | async)?.name }} Celebrates the Following Holidays:</h6>
+    </div>
+
+    <div class="
+             form-group">
+      <select class="form-control"
+              #holiday>
+        <option *ngFor="let h of (model$ | async)?.nonCelebratedHolidays"
+                value="{{h.id}}">
+          {{ h.name }}</option>
+      </select>
+      <input type="button"
+             class="btn btn-primary"
+             (click)="addHoliday(friendId.value, holiday.value)"
+             value="Add Holiday for Friend">
+    </div>
+    <ul class="list-group">
+      <li *ngFor="let h of (model$ | async)?.celebratedHolidays"
+          class="list-group-item"
+          value="">{{ h.name}}</li>
+
+    </ul>
+  </section>
+  <input type="button"
+         class="btn btn-success"
+         value="Back to List"
+         (click)="backToList()">
+</main>

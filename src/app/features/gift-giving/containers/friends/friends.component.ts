@@ -17,7 +17,7 @@ export class FriendsComponent implements OnInit {
 
   ngOnInit() {
     this.friends$ = this.store.select(selectFriendListItems);
-    this.store.dispatch(loadFriends());
+    // this.store.dispatch(loadFriends());
   }
 
 }

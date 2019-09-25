@@ -32,3 +32,8 @@ export const addFriendFailed = createAction(
   '[gift giving] add friend failed',
   props<{ entity: FriendEntity, message: string }>()
 );
+
+export const selectSelectedFriend = createAction(
+  '[gift-giving] set selected friend',
+  props<{ id: string }>()
+);

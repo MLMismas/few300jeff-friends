@@ -18,7 +18,12 @@ import { HolidaysEffects } from './effects/holidays.effects';
 import { FriendEntryComponent } from './containers/friends/friend-entry/friend-entry.component';
 import { FriendListComponent } from './containers/friends/friend-list/friend-list.component';
 import { FriendEffects } from './effects/friends.effects';
+import { FriendGiftsComponent } from './containers/friend-gifts/friend-gifts.component';
 const routes: Routes = [
+  {
+    path: 'gifts/friends/:id/holidays',
+    component: FriendGiftsComponent
+  },
   {
     path: 'gifts',
     component: GiftGivingComponent,
@@ -53,7 +58,8 @@ const routes: Routes = [
     EntryComponent,
     SortFilterComponent,
     FriendEntryComponent,
-    FriendListComponent],
+    FriendListComponent,
+    FriendGiftsComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
