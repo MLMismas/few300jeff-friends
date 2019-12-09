@@ -1,1 +1,11 @@
-<p>dashboard works!</p>
+<h4>Upcoming Holidays</h4>
+
+<div *ngFor="let h of model$ | async">
+  <h5>{{ h.holidayName}}</h5>
+  <ul>
+    <li *ngFor="let r of h.friends">
+      <p>{{ r.name }}</p>
+    </li>
+
+  </ul>
+</div>

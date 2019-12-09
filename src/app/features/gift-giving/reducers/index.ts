@@ -3,10 +3,12 @@ import * as fromHolidays from './holidays.reducer';
 import * as fromUiHints from './ui-hints.reducer';
 import * as fromFriends from './friend.reducer';
 import * as fromFriendHoliday from './friend-holiday.reducer';
+import * as moment from 'moment';
 
 import { createFeatureSelector, createSelector, ActionReducerMap } from '@ngrx/store';
 import { HolidayListItem, FriendHoliday } from '../models';
 import { FriendListItem } from '../containers/friends/models';
+import { DashboardModel } from '../models/dashboard';
 
 export interface GiftGivingState {
   holidays: fromHolidays.HolidayState;
@@ -90,8 +92,38 @@ export const selectFriendListItems = createSelector(selectFriendsArray, friends 
   } as FriendListItem))
 );
 
-// a selector that returns the model of FriendHoliday
+// selector that returns the friend holiday model for all friends
+export const selectAllFriendsHolidayModel = createSelector(
+  selectFriendsArray,
+  selectHolidayListItemsUnFiltered,
+  selectFriendHolidayEntities,
+  (friends, allHolidays, friendEntities) => {
+    const allFriendsHolidayModel = [] as FriendHoliday[];
+    friends.forEach(friend => {
+      const celebratedHolidays = friendEntities[friend.id] ? friendEntities[friend.id].holidaysCelebrated : [];
+      const nonCelebrated = allHolidays
+        .filter(h => !celebratedHolidays.includes(h.id))
+        .map(h => ({ id: h.id, name: h.name }));
+      const celebrated = allHolidays
+        .filter(h => celebratedHolidays.includes(h.id))
+        .map(h => ({ id: h.id, name: h.name }));
+      allFriendsHolidayModel.push({
+        id: friend.id,
+        name: friend.name,
+        nonCelebratedHolidays: nonCelebrated,
+        celebratedHolidays: celebrated
+      } as FriendHoliday);
+    });
+    allFriendsHolidayModel.forEach(element => {
+      element.celebratedHolidays.forEach(holiday => {
+        console.log(element.name + ' ' + holiday.name);
+      });
+    });
+    return allFriendsHolidayModel;
+  }
+);
 
+// a selector that returns the model of FriendHoliday
 export const selectFriendHolidayModel = createSelector(
   selectSelectedFriend,
   selectHolidayListItemsUnFiltered,
@@ -112,3 +144,25 @@ export const selectFriendHolidayModel = createSelector(
     } as FriendHoliday);
   }
 );
+
+export const selectDashboardModel = createSelector(
+  selectHolidayListSorted,
+  selectAllFriendsHolidayModel,
+  (holiday, friends) => {
+    const upcomingSortedHolidays = [...holiday.filter(h => !h.past)];
+    console.log(upcomingSortedHolidays);
+    return upcomingSortedHolidays.map(h => ({
+      holidayId: h.id,
+      holidayName: h.name + ' (' + moment(h.date).format('MMMM Do, YYYY') + ')',
+      friends: getFriendsForHoliday(h.id, friends)
+    } as DashboardModel));
+
+  }
+);
+
+
+// Given a holiday, and all the recipients, which recipients celebrate that holiday?
+function getFriendsForHoliday(holidayId: string, recipients: FriendHoliday[]) {
+  const recipientsCelebratingThatHoliday = recipients.filter(r => r.celebratedHolidays.some(h => h.id === holidayId));
+  return recipientsCelebratingThatHoliday.map(r => ({ id: r.id, name: r.name }));
+}
